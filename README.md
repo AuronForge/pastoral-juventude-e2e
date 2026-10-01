@@ -60,3 +60,7 @@ O smoke test valida:
 - `GET /health/ready` do backend.
 
 O projeto começa com Chromium para reduzir o tempo e o consumo de recursos da V1. Outros navegadores poderão ser adicionados quando houver requisito explícito de compatibilidade.
+
+## Deploy contínuo em desenvolvimento
+
+Consulte [docs/DEPLOY-DESENVOLVIMENTO.md](docs/DEPLOY-DESENVOLVIMENTO.md) para a integração com a esteira da infraestrutura e seus pré-requisitos.

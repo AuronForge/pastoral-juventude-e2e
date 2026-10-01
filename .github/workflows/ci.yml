@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      - develop
+      - release
   workflow_dispatch:
     inputs:
       frontend_base_url:
@@ -48,6 +50,17 @@ jobs:
 
       - name: Validate project
         run: npm run check
+
+  container:
+    name: E2E container runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build runner image and verify Chromium as non-root
+        run: |
+          docker build --tag pastoral-e2e:ci .
+          docker run --rm --user 1001:1001 -e HOME=/tmp --entrypoint node pastoral-e2e:ci -e "const {chromium}=require('@playwright/test'); (async()=>{const browser=await chromium.launch(); await browser.close();})().catch(error=>{console.error(error); process.exit(1);});"
 
   e2e:
     name: End-to-End tests
