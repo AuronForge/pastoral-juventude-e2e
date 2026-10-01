@@ -22,7 +22,16 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "auth-live",
+      testMatch: "**/auth-live.spec.ts",
+      fullyParallel: false,
+      workers: 1,
+      retries: 0,
+      use: { ...devices["Desktop Chrome"], trace: "off", video: "off", screenshot: "off" },
+    },
+    {
       name: "chromium",
+      testIgnore: "**/auth-live.spec.ts",
       use: { ...devices["Desktop Chrome"] },
     },
   ],
