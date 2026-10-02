@@ -6,7 +6,7 @@ test.describe("smoke da aplicação", () => {
   test("carrega a página inicial do frontend", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
   });
 
   test("confirma que o backend está vivo", async ({ request }) => {

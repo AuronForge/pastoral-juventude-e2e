@@ -64,3 +64,13 @@ O projeto começa com Chromium para reduzir o tempo e o consumo de recursos da V
 ## Deploy contínuo em desenvolvimento
 
 Consulte [docs/DEPLOY-DESENVOLVIMENTO.md](docs/DEPLOY-DESENVOLVIMENTO.md) para a integração com a esteira da infraestrutura e seus pré-requisitos.
+
+## Jornada de Login
+
+`tests/login.spec.ts` cobre navegação protegida, loading, 401, 429 com e sem prazo, falha de rede, 500/503 e troca obrigatória com respostas de rede controladas. Execute `npm run test:e2e -- --project=chromium tests/login.spec.ts` contra o frontend desta jornada. Esses testes não validam persistência nem Redis.
+
+`tests/auth-live.spec.ts` usa a API real e duas contas distintas em `@regressao.invalid`. Ative `E2E_AUTH_LIVE=true` somente em local, desenvolvimento ou homologação. Configure as sete variáveis de autenticação do `.env.example` através do ambiente ou secrets da CI. No workflow manual, selecione `auth_live`; no workflow reutilizável, forneça o input e os cinco secrets opcionais. Não imprima senhas nos comandos.
+
+Antes de cada execução, prepare os usuários exclusivos e reinicialize a massa de primeiro acesso com `regression:reset` do backend. A suíte não cria usuários nem redefine dados. Reserve uma origem ao executor para não compartilhar contadores de tentativas com outras suítes. A senha definitiva deve ser válida e diferente da temporária. Execute `npm run test:e2e -- --project=auth-live`. A suíte mutável tem um worker, zero retries e não gera trace, vídeo nem screenshot com credenciais reais. Sem ativação, seus testes aparecem como skipped.
+
+Após o frontend da jornada ser integrado, o smoke espera Login para acesso anônimo. Integre este PR depois do frontend, preservando os SHA de imagens usados no deploy.

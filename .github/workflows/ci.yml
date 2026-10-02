@@ -17,6 +17,15 @@ on:
         description: URL pública ou interna do backend
         required: true
         type: string
+      auth_live:
+        description: Executar autenticação real com massa regressiva preparada
+        type: boolean
+        default: false
+      auth_environment:
+        description: Ambiente da massa regressiva
+        type: choice
+        default: desenvolvimento
+        options: [desenvolvimento, homologacao]
   workflow_call:
     inputs:
       frontend_base_url:
@@ -25,6 +34,23 @@ on:
       backend_base_url:
         required: true
         type: string
+      auth_live:
+        type: boolean
+        default: false
+      auth_environment:
+        type: string
+        default: desenvolvimento
+    secrets:
+      E2E_NORMAL_EMAIL:
+        required: false
+      E2E_NORMAL_PASSWORD:
+        required: false
+      E2E_REQUIRED_CHANGE_EMAIL:
+        required: false
+      E2E_TEMPORARY_PASSWORD:
+        required: false
+      E2E_FINAL_PASSWORD:
+        required: false
 
 permissions:
   contents: read
@@ -70,6 +96,13 @@ jobs:
     env:
       E2E_FRONTEND_BASE_URL: ${{ inputs.frontend_base_url }}
       E2E_BACKEND_BASE_URL: ${{ inputs.backend_base_url }}
+      E2E_AUTH_LIVE: ${{ inputs.auth_live }}
+      E2E_ENVIRONMENT: ${{ inputs.auth_environment }}
+      E2E_NORMAL_EMAIL: ${{ secrets.E2E_NORMAL_EMAIL }}
+      E2E_NORMAL_PASSWORD: ${{ secrets.E2E_NORMAL_PASSWORD }}
+      E2E_REQUIRED_CHANGE_EMAIL: ${{ secrets.E2E_REQUIRED_CHANGE_EMAIL }}
+      E2E_TEMPORARY_PASSWORD: ${{ secrets.E2E_TEMPORARY_PASSWORD }}
+      E2E_FINAL_PASSWORD: ${{ secrets.E2E_FINAL_PASSWORD }}
 
     steps:
       - name: Check out repository
