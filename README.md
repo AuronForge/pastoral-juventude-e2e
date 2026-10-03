@@ -74,3 +74,11 @@ Consulte [docs/DEPLOY-DESENVOLVIMENTO.md](docs/DEPLOY-DESENVOLVIMENTO.md) para a
 Antes de cada execução, prepare os usuários exclusivos e reinicialize a massa de primeiro acesso com `regression:reset` do backend. A suíte não cria usuários nem redefine dados. Reserve uma origem ao executor para não compartilhar contadores de tentativas com outras suítes. A senha definitiva deve ser válida e diferente da temporária. Execute `npm run test:e2e -- --project=auth-live`. A suíte mutável tem um worker, zero retries e não gera trace, vídeo nem screenshot com credenciais reais. Sem ativação, seus testes aparecem como skipped.
 
 Após o frontend da jornada ser integrado, o smoke espera Login para acesso anônimo. Integre este PR depois do frontend, preservando os SHA de imagens usados no deploy.
+
+## Restauração da sessão
+
+A suíte session-restoration.spec.ts valida reload com respostas controladas,
+limite de três renovações, espera inicial, retry de 503 e estados de usuário
+bloqueado/inativo ou sessão substituída. A suíte auth-live.spec.ts passa a exigir
+RES-106 implantado e espera permanecer autenticada após o reload, sem storage.
+Os testes reais continuam opt-in, com massa exclusiva e capturas desativadas.
