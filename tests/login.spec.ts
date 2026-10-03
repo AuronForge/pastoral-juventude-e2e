@@ -1,6 +1,22 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 
 const endpoint = "**/api/v1/autenticacao/login";
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/v1/autenticacao/renovar-token", (route) =>
+    route.fulfill({
+      status: 400,
+      json: {
+        status: 400,
+        codigo: "TOKEN_REFRESH_AUSENTE",
+        titulo: "Sessão inexistente",
+        mensagem: "Entre novamente",
+        endpoint: "/api/v1/autenticacao/renovar-token",
+        timestamp: new Date().toISOString(),
+        correlationId: "00000000-0000-4000-8000-000000000001",
+      },
+    }),
+  );
+});
 const credentials = { email: "login@regressao.invalid", senha: "SenhaExemplo123!" };
 async function fill(page: Page) {
   await page.goto("/login");

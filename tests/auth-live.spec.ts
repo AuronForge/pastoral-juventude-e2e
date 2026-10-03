@@ -26,7 +26,7 @@ if (enabled && (finalPassword === temporaryPassword || !/^\S{8,128}$/u.test(fina
 
 test.describe("autenticação com API real", () => {
   test.skip(!enabled, "Ative E2E_AUTH_LIVE com massa exclusiva previamente preparada.");
-  test("Login normal cria cookie HttpOnly e acesso somente em memória", async ({
+  test("Login normal restaura a sessão após reload com cookie HttpOnly", async ({
     page,
     context,
   }) => {
@@ -43,8 +43,19 @@ test.describe("autenticação com API real", () => {
     if (new URL(process.env.E2E_FRONTEND_BASE_URL ?? "http://localhost").protocol === "https:")
       expect(cookie?.secure).toBe(true);
     expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+    const response = page.waitForResponse(
+      (item) =>
+        item.url().endsWith("/api/v1/autenticacao/renovar-token") &&
+        item.request().method() === "POST",
+    );
     await page.reload();
-    await expect(page).toHaveURL(/\/login$/);
+    expect((await response).status()).toBe(200);
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+    expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+    expect(
+      (await context.cookies()).some((item) => item.name === "refresh_token" && item.httpOnly),
+    ).toBe(true);
   });
   test("senha temporária exige troca, não cria sessão e nova senha exige Login", async ({
     page,
