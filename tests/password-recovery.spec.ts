@@ -18,7 +18,10 @@ async function fill(page: Page) {
   await page.goto("/recuperar-senha");
   await page.getByLabel(/^Nome completo/).fill(" Maria Silva ");
   await page.getByLabel(/^E-mail/).fill("MARIA@REGRESSAO.INVALID");
-  await page.getByLabel(/^Data de nascimento/).fill("29/02/2000");
+  const birthDate = page.getByLabel(/^Data de nascimento/);
+  await birthDate.fill(
+    (await birthDate.getAttribute("type")) === "date" ? "2000-02-29" : "29/02/2000",
+  );
   await page.getByLabel(/^Paróquia/).fill(" São  João ");
 }
 const submit = (page: Page) => page.getByRole("button", { name: "Ver minha senha temporária" });
@@ -34,9 +37,13 @@ test("login oferece recuperação e valida os quatro dados sem chamar API", asyn
   await submit(page).click();
   await expect(page.getByLabel(/^Nome completo/)).toBeFocused();
   await fill(page);
-  await page.getByLabel(/^Data de nascimento/).fill("29/02/2001");
+  const birthDate = page.getByLabel(/^Data de nascimento/);
+  const nativeCalendar = (await birthDate.getAttribute("type")) === "date";
+  // Empty native dates exercise the custom required validation. Nonexistent
+  // dates are rejected by the native input and covered in the component tests.
+  await birthDate.fill(nativeCalendar ? "" : "29/02/2001");
   await submit(page).click();
-  await expect(page.getByText(/data válida no formato/)).toBeVisible();
+  await expect(page.getByText(/data válida no formato|data de nascimento válida/)).toBeVisible();
   expect(calls).toBe(0);
 });
 test("recuperação segue por login temporário, troca obrigatória e novo login", async ({ page }) => {

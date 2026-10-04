@@ -2,6 +2,11 @@
 
 Suíte de testes End-to-End do MVP da Pastoral da Juventude, implementada exclusivamente com Playwright.
 
+O preenchimento do nascimento na recuperação aceita o DatePicker nativo (valor
+YYYY-MM-DD) e o campo textual anterior (dd/mm/aaaa) durante a transição.
+O cenário continua verificando o valor ISO enviado à API. Integre esta adaptação
+antes do PR frontend do DatePicker para manter o deploy compatível com ambos.
+
 Este repositório não contém testes unitários ou de componentes do frontend/backend. Esses testes permanecem nos respectivos repositórios.
 
 ## Requisitos
