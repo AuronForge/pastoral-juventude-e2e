@@ -44,13 +44,13 @@ async function problem(route: Route, status: number, headers: Record<string, str
   });
 }
 
-test("acesso anônimo redireciona para Login e mantém opções indisponíveis", async ({ page }) => {
+test("acesso anônimo redireciona para Login e oferece recuperação", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("checkbox", { name: /Continuar conectado/ })).toBeDisabled();
   await expect(page.getByRole("link", { name: /Esqueci minha senha/ })).toHaveAttribute(
-    "aria-disabled",
-    "true",
+    "href",
+    "/recuperar-senha",
   );
 });
 test("loading bloqueia duplicação e sucesso navega para a rota protegida", async ({ page }) => {

@@ -82,3 +82,9 @@ limite de três renovações, espera inicial, retry de 503 e estados de usuário
 bloqueado/inativo ou sessão substituída. A suíte auth-live.spec.ts passa a exigir
 RES-106 implantado e espera permanecer autenticada após o reload, sem storage.
 Os testes reais continuam opt-in, com massa exclusiva e capturas desativadas.
+
+## Recuperação de senha
+
+`tests/password-recovery.spec.ts` valida Journey002: link do Login, quatro dados obrigatórios, calendário, estados 404/409/403/429/503, fluxo recuperação → login temporário → troca obrigatória → login definitivo e acesso móvel por teclado sem overflow. Todas essas chamadas usam respostas HTTP controladas e valores fictícios; não alteram as contas do Ubuntu nem comprovam persistência real. A CI do backend verifica o mesmo ciclo com PostgreSQL, Redis, Argon2id e RS256 reais.
+
+Execute `npm run test:e2e -- --project=chromium tests/password-recovery.spec.ts` contra o frontend com a funcionalidade integrada. Para integração contínua, concluir o deploy do backend primeiro, integrar este E2E e aguardar sua CI, depois publicar o frontend novo. A validação pública real de recuperação deve usar uma conta autorizada com nome, e-mail, nascimento e paróquia completos. Ela invalida suas sessões; não capturar nem compartilhar credenciais.
