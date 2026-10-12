@@ -79,7 +79,7 @@ test("401 preserva e-mail, limpa senha e devolve foco", async ({ page }) => {
   await page.route(endpoint, (route) => problem(route, 401));
   await fill(page);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByText("E-mail ou senha incorretos")).toBeVisible();
+  await expect(page.getByText("Não foi possível entrar")).toBeVisible();
   await expect(page.getByLabel(/^E-mail/)).toHaveValue(credentials.email);
   await expect(page.getByLabel(/^Senha/)).toHaveValue("");
   await expect(page.getByLabel(/^Senha/)).toBeFocused();
@@ -105,7 +105,7 @@ test("429 sem Retry-After não inventa contador", async ({ page }) => {
   await page.route(endpoint, (route) => problem(route, 429));
   await fill(page);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByText("Limite de tentativas atingido")).toBeVisible();
+  await expect(page.getByText("Aguarde para tentar novamente")).toBeVisible();
   await expect(page.getByText(/segundos/)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Entrar", exact: true })).toBeEnabled();
 });
@@ -116,7 +116,7 @@ for (const failure of ["network", 500, 503] as const) {
     );
     await fill(page);
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    await expect(page.getByText("Não foi possível entrar")).toBeVisible();
+    await expect(page.getByText("Serviço indisponível")).toBeVisible();
     await expect(page.getByLabel(/^Senha/)).toHaveValue(credentials.senha);
     await expect(page.getByLabel(/^E-mail/)).toHaveValue(credentials.email);
     await expect(page.getByRole("button", { name: "Entrar", exact: true })).toBeEnabled();
