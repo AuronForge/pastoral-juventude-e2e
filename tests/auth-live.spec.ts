@@ -67,9 +67,12 @@ test.describe("autenticação com API real", () => {
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
     await expect(page).toHaveURL(/\/alterar-senha$/);
     expect((await context.cookies()).some((item) => item.name === "refresh_token")).toBe(false);
+    await page.getByRole("button", { name: "Definir minha senha" }).click();
     await page.getByLabel(/^Nova senha/).fill(finalPassword);
-    await page.getByLabel(/^Repita a nova senha/).fill(finalPassword);
-    await page.getByRole("button", { name: "Salvar senha" }).click();
+    await page.getByLabel(/^Confirmar nova senha/).fill(finalPassword);
+    await page.getByRole("button", { name: "Salvar nova senha" }).click();
+    await expect(page.getByRole("heading", { name: "Senha definida" })).toBeVisible();
+    await page.getByRole("button", { name: "Ir para o login" }).click();
     await expect(page.getByText("Senha alterada")).toBeVisible();
     expect((await context.cookies()).some((item) => item.name === "refresh_token")).toBe(false);
     await page.getByLabel(/^E-mail/).fill(requiredEmail);

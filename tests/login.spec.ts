@@ -146,9 +146,12 @@ test("primeiro acesso exige troca e novo Login, com token restrito no request", 
   await fill(page);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page).toHaveURL(/\/alterar-senha$/);
+  await page.getByRole("button", { name: "Definir minha senha" }).click();
   await page.getByLabel(/^Nova senha/).fill("NovaSenha123!");
-  await page.getByLabel(/^Repita a nova senha/).fill("NovaSenha123!");
-  await page.getByRole("button", { name: "Salvar senha" }).click();
+  await page.getByLabel(/^Confirmar nova senha/).fill("NovaSenha123!");
+  await page.getByRole("button", { name: "Salvar nova senha" }).click();
+  await expect(page.getByRole("heading", { name: "Senha definida" })).toBeVisible();
+  await page.getByRole("button", { name: "Ir para o login" }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByText("Senha alterada")).toBeVisible();
   await expect(page.getByLabel(/^Senha/)).toHaveValue("");
