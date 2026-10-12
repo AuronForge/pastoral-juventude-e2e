@@ -100,9 +100,12 @@ test("recuperação segue por login temporário, troca obrigatória e novo login
   await page.getByLabel(/^Senha/).fill(temporary);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page).toHaveURL(/\/alterar-senha$/u);
+  await page.getByRole("button", { name: "Definir minha senha" }).click();
   await page.getByLabel(/^Nova senha/).fill("DefinitivaFixture123!");
-  await page.getByLabel(/^Repita a nova senha/).fill("DefinitivaFixture123!");
-  await page.getByRole("button", { name: "Salvar senha" }).click();
+  await page.getByLabel(/^Confirmar nova senha/).fill("DefinitivaFixture123!");
+  await page.getByRole("button", { name: "Salvar nova senha" }).click();
+  await expect(page.getByRole("heading", { name: "Senha definida" })).toBeVisible();
+  await page.getByRole("button", { name: "Ir para o login" }).click();
   await expect(page).toHaveURL(/\/login$/u);
   await page.getByLabel(/^E-mail/).fill("maria@regressao.invalid");
   await page.getByLabel(/^Senha/).fill("DefinitivaFixture123!");
