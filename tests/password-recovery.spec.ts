@@ -22,9 +22,9 @@ async function fill(page: Page) {
   await birthDate.fill(
     (await birthDate.getAttribute("type")) === "date" ? "2000-02-29" : "29/02/2000",
   );
-  await page.getByLabel(/^Paróquia/).fill(" São  João ");
+  await page.getByLabel(/^Nome da paróquia/).fill(" São  João ");
 }
-const submit = (page: Page) => page.getByRole("button", { name: "Ver minha senha temporária" });
+const submit = (page: Page) => page.getByRole("button", { name: "Gerar senha temporária" });
 test("login oferece recuperação e valida os quatro dados sem chamar API", async ({ page }) => {
   let calls = 0;
   await page.route(recovery, (route) => {
@@ -43,7 +43,7 @@ test("login oferece recuperação e valida os quatro dados sem chamar API", asyn
   // dates are rejected by the native input and covered in the component tests.
   await birthDate.fill(nativeCalendar ? "" : "29/02/2001");
   await submit(page).click();
-  await expect(page.getByText(/data válida no formato|data de nascimento válida/)).toBeVisible();
+  await expect(page.getByText("Data inválida")).toBeVisible();
   expect(calls).toBe(0);
 });
 test("recuperação segue por login temporário, troca obrigatória e novo login", async ({ page }) => {
@@ -87,14 +87,14 @@ test("recuperação segue por login temporário, troca obrigatória e novo login
   );
   await fill(page);
   await submit(page).click();
-  await expect(page.getByRole("heading", { name: "Sua senha temporária" })).toBeFocused();
-  await expect(page.getByText(temporary)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Senha temporária gerada" })).toBeFocused();
+  await expect(page.getByLabel("Sua senha temporária")).toHaveValue(temporary);
   await expect(page.getByRole("button", { name: /Pedir outra em/ })).toBeDisabled();
   expect(requests).toBe(1);
   expect(await page.evaluate(() => JSON.stringify([localStorage, sessionStorage]))).not.toContain(
     temporary,
   );
-  await page.getByRole("button", { name: "Voltar para entrar" }).click();
+  await page.getByRole("button", { name: "Entrar com senha temporária" }).click();
   await expect(page.getByText(temporary)).toHaveCount(0);
   await page.getByLabel(/^E-mail/).fill("maria@regressao.invalid");
   await page.getByLabel(/^Senha/).fill(temporary);
@@ -110,11 +110,11 @@ test("recuperação segue por login temporário, troca obrigatória e novo login
   await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
 });
 for (const [status, codigo, title] of [
-  [404, "DADOS_RECUPERACAO_NAO_LOCALIZADOS", "Não foi possível confirmar seus dados"],
-  [409, "RECUPERACAO_SENHA_EM_ANDAMENTO", "Já existe uma recuperação em andamento"],
+  [404, "DADOS_RECUPERACAO_NAO_LOCALIZADOS", "Confira os dados informados"],
+  [409, "RECUPERACAO_SENHA_EM_ANDAMENTO", "Recuperação já iniciada"],
   [403, "USUARIO_INATIVO", "Esta conta está inativa"],
-  [429, "LIMITE_TENTATIVAS_EXCEDIDO", "Muitas tentativas"],
-  [503, "SERVICO_INDISPONIVEL", "Não foi possível recuperar sua senha"],
+  [429, "LIMITE_TENTATIVAS_EXCEDIDO", "Aguarde para tentar novamente"],
+  [503, "SERVICO_INDISPONIVEL", "Não foi possível recuperar"],
 ] as const)
   test(`recuperação trata ${codigo} sem gerar nova senha`, async ({ page }) => {
     let calls = 0;
@@ -136,7 +136,7 @@ for (const [status, codigo, title] of [
     await submit(page).click();
     await expect(page.getByRole("alert")).toContainText(title);
     await expect(page.getByText("Campo específico divergente")).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Sua senha temporária" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Senha temporária gerada" })).toHaveCount(0);
     if (status === 429) {
       await expect(submit(page)).toBeDisabled();
       expect(calls).toBe(1);
@@ -148,7 +148,7 @@ test("formulário mobile permite teclado e não ultrapassa a viewport", async ({
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
-  await page.getByLabel(/^Paróquia/).focus();
+  await page.getByLabel(/^Nome da paróquia/).focus();
   await page.keyboard.press("Tab");
   await expect(submit(page)).toBeFocused();
   expect((await submit(page).boundingBox())!.height).toBeGreaterThanOrEqual(44);
