@@ -44,14 +44,16 @@ test("reload restaura com cookie HttpOnly sem storage e respeita o limite de tr�
   await expect(page).toHaveURL(/\/$/);
   for (let i = 0; i < 3; i++) {
     await page.reload();
-    await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bem-vindo(a)" })).toBeVisible();
     await expect(page).toHaveURL(/\/$/);
     expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
     expect(await page.evaluate(() => document.cookie.includes("refresh_token"))).toBe(false);
   }
   await page.reload();
   await expect(page).toHaveURL(/\/login$/);
-  await expect(page.getByText("Tempo esgotado")).toBeVisible();
+  await expect(
+    page.getByText("Sua sessão expirou. Faça um novo login para continuar."),
+  ).toBeVisible();
   expect(renewals).toBe(4);
 });
 test("aguarda resposta sem exibir login e oferece nova tentativa em 503", async ({ page }) => {
@@ -77,11 +79,13 @@ test("aguarda resposta sem exibir login e oferece nova tentativa em 503", async 
   release();
   await expect(page.getByText("Não foi possível restaurar sua sessão")).toBeVisible();
   await page.getByRole("button", { name: "Tentar novamente" }).click();
-  await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bem-vindo(a)" })).toBeVisible();
   expect(requests).toBe(2);
 });
 for (const [status, code, title] of [
-  [409, "SESSAO_SUBSTITUIDA", "Sessão substituída"],
+  [409, "SESSAO_SUBSTITUIDA", "Sua sessão não é mais válida. Faça um novo login."],
+  [401, "SESSAO_INVALIDA", "Sua sessão não é mais válida. Faça um novo login."],
+  [401, "SESSAO_EXPIRADA", "Sua sessão expirou. Faça um novo login para continuar."],
   [403, "USUARIO_BLOQUEADO", "Usuário bloqueado"],
   [403, "USUARIO_INATIVO", "Usuário inativo"],
 ] as const) {
