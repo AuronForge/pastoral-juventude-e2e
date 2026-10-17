@@ -110,7 +110,7 @@ test("recuperação segue por login temporário, troca obrigatória e novo login
   await page.getByLabel(/^E-mail/).fill("maria@regressao.invalid");
   await page.getByLabel(/^Senha/).fill("DefinitivaFixture123!");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bem-vindo(a)" })).toBeVisible();
 });
 for (const [status, codigo, title] of [
   [404, "DADOS_RECUPERACAO_NAO_LOCALIZADOS", "Confira os dados informados"],

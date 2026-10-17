@@ -70,7 +70,7 @@ test("loading bloqueia duplicação e sucesso navega para a rota protegida", asy
   expect(requests).toBe(1);
   release();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bem-vindo(a)" })).toBeVisible();
   expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
   await page.reload();
   await expect(page).toHaveURL(/\/login$/);

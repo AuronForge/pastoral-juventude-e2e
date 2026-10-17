@@ -51,7 +51,7 @@ test.describe("autenticação com API real", () => {
     await page.reload();
     expect((await response).status()).toBe(200);
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("heading", { name: "Pastoral da Juventude" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bem-vindo(a)" })).toBeVisible();
     expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
     expect(
       (await context.cookies()).some((item) => item.name === "refresh_token" && item.httpOnly),
